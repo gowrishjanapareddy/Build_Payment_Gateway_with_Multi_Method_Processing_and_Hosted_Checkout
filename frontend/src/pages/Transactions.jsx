@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
 
 export default function Transactions() {
-  const [txs, setTxs] = useState([]);
+  const [payments, setPayments] = useState([]);
 
   useEffect(() => {
     fetch('http://localhost:8000/api/v1/payments/all')
       .then(r => r.json())
-      .then(setTxs);
+      .then(data => setPayments(data));
   }, []);
 
   return (
     <div style={{ padding: '40px', fontFamily: 'sans-serif' }}>
-      <h2>Transaction History</h2>
-      <a href="/dashboard" style={{marginBottom: '20px', display: 'block'}}>← Back to Dashboard</a>
-      <table data-test-id="transactions-table" border="1" style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead style={{ background: '#f8f9fa' }}>
-          <tr>
+      <h1>Transaction History</h1>
+      <a href="/dashboard">← Back to Dashboard</a>
+      <br /><br />
+      <table border="1" cellPadding="10" style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr style={{ backgroundColor: '#f4f4f4' }}>
             <th>Payment ID</th>
             <th>Order ID</th>
             <th>Amount</th>
@@ -24,13 +25,16 @@ export default function Transactions() {
           </tr>
         </thead>
         <tbody>
-          {txs.map(t => (
-            <tr key={t.id} data-test-id="transaction-row" data-payment-id={t.id}>
-              <td data-test-id="payment-id">{t.id}</td>
-              <td data-test-id="order-id">{t.order_id}</td>
-              <td data-test-id="amount">{t.amount}</td>
-              <td data-test-id="method">{t.method}</td>
-              <td data-test-id="status">{t.status}</td>
+          {payments.map(p => (
+            <tr key={p.id}>
+              <td>{p.id}</td>
+              <td>{p.order_id}</td>
+              {/* Divide by 100 to show Rupees instead of Paise */}
+              <td>₹{(p.amount / 100).toFixed(2)}</td>
+              <td>{p.method}</td>
+              <td style={{ color: p.status === 'success' ? 'green' : 'red' }}>
+                {p.status}
+              </td>
             </tr>
           ))}
         </tbody>
